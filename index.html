@@ -6,7 +6,6 @@
     <title>Casa WOW Awards - HTML Card Generator</title>
     <style>
         /* ...[unchanged styles from your original file]... */
-        /* For brevity, styles are unchanged. You can keep your original styles here. */
         * {
             margin: 0;
             padding: 0;
@@ -29,24 +28,7 @@
         /* ...[rest of your CSS here, unchanged]... */
         /* Copy all your original styles */
     </style>
-
-    <script>
-      // Assuming these are for a file system in a specific environment, keeping them as is.
-      const files = {}
-      window.fs = {}
-      window.fs.readFile = (fileName) => {
-        return new Promise((resolve) => {
-          const content = files[fileName]
-          const decoded = atob(content)
-          const arr = new Uint8Array(decoded.length)
-          for (let i = 0; i < decoded.length; i++) {
-            arr[i] = decoded.charCodeAt(i)
-          }
-          resolve(arr)
-        })
-      }
-    </script>
-    </head>
+</head>
 <body>
     <div class="container">
         <div class="header">
@@ -293,7 +275,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "claude-3-5-sonnet", // Or your preferred model
+                        model: "claude-3-5-sonnet",
                         messages: [
                             {
                                 role: "system",
@@ -347,7 +329,7 @@
         async function generateCard() {
             const recognitionText = document.getElementById('recognition').value.trim();
             const nomineeName = document.getElementById('nomineeName').value.trim();
-            const impactTypes = getSelectedImpactTypes(); // This will now always be an array with 0 or 1 element
+            const impactTypes = getSelectedImpactTypes();
             
             if (!recognitionText || !nomineeName) {
                 alert('Please enter both the nominee name and recognition message!');
@@ -381,7 +363,7 @@
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
                 // Generate the actual HTML card content
-                const impactTypeDisplay = impactTypes.length > 0 ? impactTypes[0] : ''; // Get the single selected impact type
+                const impactTypeDisplay = impactTypes.length > 0 ? impactTypes[0] : '';
                 
                 // Conditionally include image HTML
                 const imageHtml = uploadedImageData ? 
@@ -482,15 +464,17 @@
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 20px;">
-                        <button class="download-card-btn" onclick="downloadHTMLCard()">
+                        <button class="download-card-btn" id="downloadCardBtn">
                             Download HTML Card
                         </button>
-                        <button class="email-card-btn" onclick="emailCard()">
+                        <button class="email-card-btn" id="emailCardBtn">
                             Email Card
                         </button>
                     </div>
                 `;
-                
+                // Attach event listeners to dynamically created buttons
+                document.getElementById("downloadCardBtn").addEventListener("click", downloadHTMLCard);
+                document.getElementById("emailCardBtn").addEventListener("click", emailCard);
             } catch (error) {
                 loading.style.display = 'none';
                 errorMessage.style.display = 'block';
@@ -531,7 +515,7 @@
             window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
         }
 
-        // Event listeners
+        // Event listeners for static form elements
         document.getElementById('recognition').addEventListener('input', updatePreview);
         document.getElementById('nomineeName').addEventListener('input', updatePreview);
         document.querySelectorAll('input[name="impactType"]').forEach(radio => {
@@ -541,9 +525,9 @@
         document.getElementById('removePhotoBtn').addEventListener('click', removePhoto);
         document.getElementById('enhanceBtn').addEventListener('click', enhanceRecognition);
         document.getElementById('cardForm').addEventListener('submit', handleFormSubmit);
-
     </script>
 </body>
 </html>
+
 
 
