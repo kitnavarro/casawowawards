@@ -631,21 +631,6 @@
         }
     </style>
 
-    <script>
-      const files = {}
-      window.fs = {}
-      window.fs.readFile = (fileName) => {
-        return new Promise((resolve) => {
-          const content = files[fileName]
-          const decoded = atob(content)
-          const arr = new Uint8Array(decoded.length)
-          for (let i = 0; i < decoded.length; i++) {
-            arr[i] = decoded.charCodeAt(i)
-          }
-          resolve(arr)
-        })
-      }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -672,7 +657,7 @@
                 </div>
             </div>
 
-            <form id="cardForm">
+            <form id="cardForm" action="YOUR_WEB_APP_URL_HERE" method="post">
                 <div class="form-group">
                     <label for="nomineeName" class="recognition-label">
                         <strong>Nominee Name:</strong>
@@ -680,6 +665,7 @@
                     <input 
                         type="text"
                         id="nomineeName" 
+                        name="nomineeName"
                         class="nominee-input" 
                         placeholder="Enter the nominee's name..."
                         required
@@ -707,7 +693,7 @@
                         <strong>Optional: Insert Photo for the Card</strong>
                     </label>
                     <div class="photo-input-wrapper">
-                        <input type="file" id="photoUpload" accept="image/jpeg, image/png, image/gif" class="photo-input">
+                        <input type="file" id="photoUpload" name="photoUpload" accept="image/jpeg, image/png, image/gif" class="photo-input">
                         <label for="photoUpload">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20">
                                 <path d="M0 6c0-1.1.9-2 2-2h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H2c-1.1 0-2-.9-2-2V6zm10 10a4 4 0 100-8 4 4 0 000 8zm0-2a2 2 0 110-4 2 2 0 010 4z"/>
@@ -728,6 +714,7 @@
                     </label>
                     <textarea 
                         id="recognition" 
+                        name="recognition"
                         class="recognition-input" 
                         placeholder="Write your meaningful recognition here..."
                         required
@@ -735,10 +722,7 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="button" class="action-btn enhance-btn" id="enhanceBtn">
-                        Enhance Description (AI)
-                    </button>
-                    <button type="submit" class="action-btn generate-btn" id="generateBtn" style="display: none;">
+                    <button type="submit" class="action-btn generate-btn" id="generateBtn">
                         Generate Card
                     </button>
                 </div>
@@ -774,28 +758,18 @@
     </div>
 
     <script>
-        let originalRecognitionText = '';
-        let enhancedRecognitionText = '';
-        let finalRecognitionText = '';
-        let currentNomineeName = '';
-        let currentImpactTypes = [];
-        let generatedCardHTML = '';
-        let isEnhancing = false;
-        let uploadedImageData = null;
+        // This JavaScript will now handle the form submission differently,
+        // sending the data to your Google Apps Script instead of local processing.
 
-        function updatePreview() {
-            const recognitionText = document.getElementById('recognition').value.trim();
-            const nomineeName = document.getElementById('nomineeName').value.trim();
-            const impactTypes = getSelectedImpactTypes();
-            currentNomineeName = nomineeName;
-            currentImpactTypes = impactTypes;
-        }
-        
+        // The old functions for local card generation and emailing are no longer needed,
+        // as the Apps Script handles that.
+
         function getSelectedImpactTypes() {
             const selectedRadio = document.querySelector('input[name="impactType"]:checked');
             return selectedRadio ? [selectedRadio.value] : [];
         }
 
+        // Handles the display of a file upload preview
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             const imagePreview = document.getElementById('imagePreview');
@@ -823,322 +797,27 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    uploadedImageData = e.target.result;
-                    imagePreview.src = uploadedImageData;
+                    imagePreview.src = e.target.result;
                     imagePreview.style.display = 'block';
                     removePhotoBtn.style.display = 'inline-block';
-                    updatePreview();
                 };
                 reader.readAsDataURL(file);
             } else {
-                uploadedImageData = null;
                 imagePreview.src = '#';
                 imagePreview.style.display = 'none';
                 removePhotoBtn.style.display = 'none';
             }
         }
 
+        // Handles removing a photo from the upload input
         function removePhoto() {
-            uploadedImageData = null;
             document.getElementById('photoUpload').value = '';
             document.getElementById('imagePreview').src = '#';
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('removePhotoBtn').style.display = 'none';
-            updatePreview();
         }
-
-        function toggleGenerateButton(show) {
-            const generateBtn = document.getElementById('generateBtn');
-            generateBtn.style.display = show ? 'block' : 'none';
-        }
-
-        function selectRecognitionText(version) {
-            finalRecognitionText = version === 'original' ? originalRecognitionText : enhancedRecognitionText;
-            const enhancementOptions = document.getElementById('enhancementOptions');
-            enhancementOptions.style.display = 'none';
-            document.getElementById('recognition').value = finalRecognitionText;
-            document.getElementById('cardForm').scrollIntoView({ behavior: 'smooth' });
-            toggleGenerateButton(true);
-        }
-
-        async function enhanceRecognition() {
-            const recognitionInput = document.getElementById('recognition');
-            let recognitionText = recognitionInput.value.trim();
-            const enhanceBtn = document.getElementById('enhanceBtn');
-            const enhancementOptions = document.getElementById('enhancementOptions');
-            const errorMessageDiv = document.getElementById('errorMessage');
-
-            if (!recognitionText) {
-                alert('Please enter a recognition description to enhance!');
-                return;
-            }
-            
-            enhancementOptions.style.display = 'none';
-            toggleGenerateButton(false);
-            isEnhancing = true;
-            enhanceBtn.disabled = true;
-            enhanceBtn.textContent = 'Enhancing...';
-            errorMessageDiv.style.display = 'none';
-
-            try {
-                originalRecognitionText = recognitionText;
-                
-                const apiUrl = 'https://proxy.fuelix.ai/v1/chat/completions';
-                const apiKey = 'sk-qlkhkNbXZ9AHionHg10Ycf';
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "claude-3-5-sonnet",
-                        messages: [
-                            {
-                                role: "system",
-                                content: "You are a helpful assistant that rephrases text while maintaining its meaning, making it more professional and engaging for a recognition award. Do not add introductory or concluding phrases, just the rephrased content."
-                            },
-                            {
-                                role: "user",
-                                content: `Please rephrase this paragraph in a professional and engaging way suitable for a corporate recognition award, focusing on impact: ${recognitionText}`
-                            }
-                        ],
-                        temperature: 0.7,
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok && data.choices && data.choices[0] && data.choices[0].message) {
-                    enhancedRecognitionText = data.choices[0].message.content.trim();
-                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Here's|Here is|I've|I have|This is|The following is).*?(a|an|the)?\s?(professionally )?(rephrased|enhanced|improved|refined|polished|new).*?(version|paragraph|text|content).*?:/i, "").trim();
-                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Certainly! |Here's an enhanced version of your recognition: |I can help with that. Here's a professional and engaging rephrasing: |Absolutely, here's a refined recognition message: |Okay, here’s a more impactful version: |Rephrased recognition: )/i, "").trim();
-                    
-                    document.getElementById('originalTextPreview').textContent = originalRecognitionText;
-                    document.getElementById('enhancedTextPreview').textContent = enhancedRecognitionText;
-                    
-                    enhancementOptions.style.display = 'block';
-                    enhancementOptions.scrollIntoView({ behavior: 'smooth' });
-                    
-                    finalRecognitionText = originalRecognitionText;
-                } else {
-                    const errorMsg = data.error ? data.error.message : 'Unknown error from API';
-                    throw new Error(`API Error: ${errorMsg}`);
-                }
-            } catch (error) {
-                console.error('Error enhancing recognition:', error);
-                errorMessageDiv.textContent = `Failed to enhance description: ${error.message}. Please try again or check your API setup.`;
-                errorMessageDiv.style.display = 'block';
-            } finally {
-                isEnhancing = false;
-                enhanceBtn.disabled = false;
-                enhanceBtn.textContent = 'Enhance Description (AI)';
-            }
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            if (isEnhancing) {
-                alert('Please wait for the AI enhancement to complete.');
-                return;
-            }
-            generateCard();
-        }
-
-        async function generateCard() {
-            const nomineeName = document.getElementById('nomineeName').value.trim();
-            const impactTypes = getSelectedImpactTypes();
-            
-            if (!finalRecognitionText || !nomineeName) {
-                alert('Please enter a nominee name and either write or select your recognition message!');
-                return;
-            }
-
-            if (impactTypes.length === 0) {
-                alert('Please select an Impact Type!');
-                return;
-            }
-
-            const resultSection = document.getElementById('resultSection');
-            const loading = document.getElementById('loading');
-            const cardResult = document.getElementById('cardResult');
-            const errorMessage = document.getElementById('errorMessage');
-            const generateBtn = document.getElementById('generateBtn');
-            const enhanceBtn = document.getElementById('enhanceBtn');
-
-            resultSection.style.display = 'block';
-            loading.style.display = 'block';
-            cardResult.innerHTML = '';
-            errorMessage.style.display = 'none';
-            generateBtn.disabled = true;
-            enhanceBtn.disabled = true;
-            generateBtn.textContent = 'Creating Card...';
-
-            try {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                const impactTypeDisplay = impactTypes.length > 0 ? impactTypes[0] : '';
-                
-                const imageHtml = uploadedImageData ? 
-                    `<div class="card-image-container"><img src="${uploadedImageData}" alt="Recognition Photo" class="card-image"></div>` : '';
-                
-                generatedCardHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <title>Casa WOW Recognition Card - ${nomineeName}</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            padding: 40px; 
-            background: white;
-        }
-        .card {
-            width: 500px;
-            border: 8px solid #4B286D;
-            border-radius: 15px;
-            padding: 40px;
-            margin: 0 auto;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4B286D;
-            margin-bottom: 20px;
-        }
-        .casa-wower {
-            font-size: 18px;
-            font-weight: bold;
-            color: #66CC00;
-            margin-bottom: 20px;
-        }
-        .impact-type {
-            font-size: 16px;
-            font-weight: bold;
-            color: #4B286D;
-            margin-bottom: 20px;
-            background: #f8f5ff;
-            padding: 10px;
-            border-radius: 8px;
-            border: 2px solid #d1c4e9;
-        }
-        .card-image-container {
-            margin-bottom: 20px;
-        }
-        .card-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            display: block;
-            margin: 0 auto;
-            max-height: 200px;
-            object-fit: contain;
-        }
-        .content {
-            font-size: 16px;
-            color: #374151;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .footer {
-            font-size: 14px;
-            color: #66CC00;
-            font-weight: 600;
-            border-top: 2px solid #f3f4f6;
-            padding-top: 15px;
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="title">🏆 Congratulations</div>
-        <div class="casa-wower">Casa Wower: ${nomineeName}</div>
-        ${imageHtml} <div class="impact-type">${impactTypeDisplay}</div>
-        <div class="content">${finalRecognitionText}</div>
-        <div class="footer">TELUS • Casa WOW Awards</div>
-    </div>
-</body>
-</html>`;
-                
-                loading.style.display = 'none';
-                cardResult.innerHTML = `
-                    <h3 style="color: #4B286D; margin-bottom: 15px; text-align: center;">Your Casa WOW Award Card</h3>
-                    <div class="card-preview">
-                        <div class="card-content">
-                            <div class="card-title">🏆 Congratulations</div>
-                            <div class="casa-wower">Casa Wower: ${nomineeName}</div>
-                            ${imageHtml} <div class="impact-type"> ${impactTypeDisplay}</div>
-                            <div class="card-text">${finalRecognitionText}</div>
-                            <div class="card-footer">TELUS • Casa WOW Awards</div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="download-card-btn" onclick="downloadHTMLCard()">
-                            Download Card
-                        </button>
-                        <button class="email-card-btn" onclick="emailCard()">
-                            Email Card
-                        </button>
-                    </div>
-                `;
-                
-            } catch (error) {
-                loading.style.display = 'none';
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = `Error creating card: ${error.message}`;
-            } finally {
-                generateBtn.disabled = false;
-                enhanceBtn.disabled = false;
-                generateBtn.textContent = 'Generate Card';
-            }
-        }
-
-        function downloadHTMLCard() {
-            if (!generatedCardHTML) {
-                alert('No card generated yet. Please generate a card first.');
-                return;
-            }
-
-            try {
-                const blob = new Blob([generatedCardHTML], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                
-                const downloadLink = document.createElement('a');
-                downloadLink.href = url;
-                downloadLink.download = `casa-wow-recognition-${currentNomineeName.replace(/\s+/g, '-').toLowerCase()}.html`;
-                downloadLink.style.display = 'none';
-                
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                
-                setTimeout(() => URL.revokeObjectURL(url), 100);
-                
-                alert('HTML card downloaded successfully! Open the HTML file to view your recognition card.');
-            } catch (error) {
-                console.error('Download error:', error);
-                alert('Error downloading card. Please try again.');
-            }
-        }
-
-        function emailCard() {
-            if (!finalRecognitionText || !currentNomineeName) {
-                alert('Please generate a card first to email it.');
-                return;
-            }
-
-            const subject = `You've received a Casa WOW Award!`;
-            const body = `Hi ${currentNomineeName},\n\nI wanted to send you this Casa WOW Award to recognize your hard work and dedication.\n\nHere is the recognition message:\n\n${finalRecognitionText}\n\n[NOTE: You can now attach the HTML file you just downloaded to this email!]\n\nCongratulations!`;
-
-            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-            window.location.href = mailtoLink;
-        }
-
+        
+        // This function will handle the collapsible header
         document.addEventListener('DOMContentLoaded', function() {
             const collapsibleHeader = document.querySelector('.collapsible-header');
             if (collapsibleHeader) {
@@ -1153,53 +832,21 @@
                 });
             }
 
-            const recognitionInput = document.getElementById('recognition');
-            const nomineeInput = document.getElementById('nomineeName');
-            const impactTypeRadios = document.querySelectorAll('input[name="impactType"]');
+            // Bind the photo upload event listeners
             const photoUploadInput = document.getElementById('photoUpload');
             const removePhotoBtn = document.getElementById('removePhotoBtn');
-            const enhanceButton = document.getElementById('enhanceBtn');
-            const cardForm = document.getElementById('cardForm');
-            
-            if (recognitionInput) {
-                recognitionInput.addEventListener('input', updatePreview);
-                recognitionInput.addEventListener('input', function() {
-                    const charCount = this.value.length;
-                    if (charCount > 500) { 
-                        this.style.borderColor = '#f59e0b';
-                    } else {
-                        this.style.borderColor = '#e5e7eb';
-                    }
-                });
-            }
-
-            if (nomineeInput) {
-                nomineeInput.addEventListener('input', updatePreview);
-            }
-
-            impactTypeRadios.forEach(radio => {
-                radio.addEventListener('change', updatePreview);
-            });
-
             if (photoUploadInput) {
                 photoUploadInput.addEventListener('change', handlePhotoUpload);
             }
             if (removePhotoBtn) {
                 removePhotoBtn.addEventListener('click', removePhoto);
             }
-
-            if (enhanceButton) {
-                enhanceButton.addEventListener('click', enhanceRecognition);
-            }
-
-            if (cardForm) {
-                cardForm.addEventListener('submit', handleFormSubmit);
-            }
-
-            // Hide the Generate button on page load
-            toggleGenerateButton(false);
-
-            console.log('Casa WOW Awards interface loaded successfully!');
+            
+            // To ensure the form works with the Apps Script, we use a simple form submission
+            // without custom JavaScript. The form's `action` and `method` attributes handle it.
+            // All old custom JS form logic has been removed.
+            
+            console.log('Casa WOW Awards interface loaded successfully and configured for Apps Script.');
         });
     </script>
 </body>
