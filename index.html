@@ -126,7 +126,7 @@
             margin: 0;
         }
 
-        /* NEW PHOTO UPLOAD STYLES */
+        /* PHOTO UPLOAD STYLES */
         .photo-upload-group {
             margin-bottom: 25px;
             border: 1px dashed #ccc;
@@ -148,11 +148,10 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            flex-wrap: wrap; /* For responsiveness */
+            flex-wrap: wrap;
         }
 
         .photo-input {
-            /* Hide default file input button */
             width: 0.1px;
             height: 0.1px;
             opacity: 0;
@@ -190,7 +189,7 @@
             border-radius: 8px;
             object-fit: contain;
             border: 1px solid #ddd;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .remove-photo-btn {
@@ -202,24 +201,23 @@
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.3s ease;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .remove-photo-btn:hover {
             background: #dc2626;
         }
-        /* END NEW PHOTO UPLOAD STYLES */
-
+        /* END PHOTO UPLOAD STYLES */
 
         .button-group {
             display: flex;
-            gap: 15px; /* Space between buttons */
+            gap: 15px;
             margin-top: 25px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            flex-wrap: wrap;
         }
 
         .action-btn {
-            flex: 1; /* Allow buttons to grow and shrink */
+            flex: 1;
             padding: 18px;
             border: none;
             border-radius: 10px;
@@ -229,7 +227,7 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            min-width: 180px; /* Minimum width for buttons */
+            min-width: 180px;
         }
 
         .generate-btn {
@@ -254,7 +252,6 @@
             background: #5a3380;
         }
 
-
         .action-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -268,7 +265,7 @@
             border-top: 2px solid #f3f4f6;
         }
         
-        /* NEW STYLES FOR ENHANCEMENT SELECTION */
+        /* STYLES FOR ENHANCEMENT SELECTION */
         .enhancement-options {
             display: none;
             margin-top: 20px;
@@ -401,7 +398,6 @@
             border: 2px solid #d1c4e9;
         }
 
-        /* NEW CARD IMAGE STYLES */
         .card-image-container {
             margin-bottom: 20px;
         }
@@ -409,12 +405,11 @@
             max-width: 100%;
             height: auto;
             border-radius: 8px;
-            display: block; /* Ensures it doesn't leave space below */
-            margin: 0 auto; /* Center the image */
-            max-height: 200px; /* Limit height */
-            object-fit: contain; /* Ensure entire image is visible */
+            display: block;
+            margin: 0 auto;
+            max-height: 200px;
+            object-fit: contain;
         }
-        /* END NEW CARD IMAGE STYLES */
 
         .card-text {
             font-size: 16px;
@@ -630,7 +625,6 @@
             }
         }
     </style>
-
 </head>
 <body>
     <div class="container">
@@ -657,7 +651,7 @@
                 </div>
             </div>
 
-            <form id="cardForm" action="YOUR_WEB_APP_URL_HERE" method="post">
+            <form id="cardForm">
                 <div class="form-group">
                     <label for="nomineeName" class="recognition-label">
                         <strong>Nominee Name:</strong>
@@ -722,7 +716,10 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="submit" class="action-btn generate-btn" id="generateBtn">
+                    <button type="button" class="action-btn enhance-btn" id="enhanceBtn">
+                        Enhance Description (AI)
+                    </button>
+                    <button type="button" class="action-btn generate-btn" id="generateBtn" style="display: none;">
                         Generate Card
                     </button>
                 </div>
@@ -758,18 +755,22 @@
     </div>
 
     <script>
-        // This JavaScript will now handle the form submission differently,
-        // sending the data to your Google Apps Script instead of local processing.
-
-        // The old functions for local card generation and emailing are no longer needed,
-        // as the Apps Script handles that.
+        // *** IMPORTANT: Insert your Google Apps Script Web App URL here ***
+        const APPS_SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE';
+        
+        let originalRecognitionText = '';
+        let enhancedRecognitionText = '';
+        let finalRecognitionText = '';
+        let currentNomineeName = '';
+        let currentImpactTypes = [];
+        let isEnhancing = false;
+        let uploadedImageData = null;
 
         function getSelectedImpactTypes() {
             const selectedRadio = document.querySelector('input[name="impactType"]:checked');
             return selectedRadio ? [selectedRadio.value] : [];
         }
 
-        // Handles the display of a file upload preview
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             const imagePreview = document.getElementById('imagePreview');
@@ -797,28 +798,180 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
+                    uploadedImageData = e.target.result;
+                    imagePreview.src = uploadedImageData;
                     imagePreview.style.display = 'block';
                     removePhotoBtn.style.display = 'inline-block';
                 };
                 reader.readAsDataURL(file);
             } else {
+                uploadedImageData = null;
                 imagePreview.src = '#';
                 imagePreview.style.display = 'none';
                 removePhotoBtn.style.display = 'none';
             }
         }
 
-        // Handles removing a photo from the upload input
         function removePhoto() {
+            uploadedImageData = null;
             document.getElementById('photoUpload').value = '';
             document.getElementById('imagePreview').src = '#';
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('removePhotoBtn').style.display = 'none';
         }
+
+        function toggleGenerateButton(show) {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.style.display = show ? 'block' : 'none';
+        }
         
-        // This function will handle the collapsible header
+        function selectRecognitionText(version) {
+            finalRecognitionText = version === 'original' ? originalRecognitionText : enhancedRecognitionText;
+            document.getElementById('recognition').value = finalRecognitionText;
+            document.getElementById('enhancementOptions').style.display = 'none';
+            toggleGenerateButton(true);
+            document.getElementById('generateBtn').focus();
+            
+            // Re-enable the enhance button for a new round
+            document.getElementById('enhanceBtn').disabled = false;
+        }
+
+        async function enhanceRecognition() {
+            const recognitionInput = document.getElementById('recognition');
+            const recognitionText = recognitionInput.value.trim();
+            const enhanceBtn = document.getElementById('enhanceBtn');
+            const enhancementOptions = document.getElementById('enhancementOptions');
+            const errorMessageDiv = document.getElementById('errorMessage');
+
+            if (!recognitionText) {
+                alert('Please enter a recognition description to enhance!');
+                return;
+            }
+            
+            enhancementOptions.style.display = 'none';
+            toggleGenerateButton(false);
+            isEnhancing = true;
+            enhanceBtn.disabled = true;
+            enhanceBtn.textContent = 'Enhancing...';
+            errorMessageDiv.style.display = 'none';
+
+            try {
+                originalRecognitionText = recognitionText;
+                
+                // IMPORTANT: Replace with your actual AI API endpoint and key
+                const apiUrl = 'https://proxy.fuelix.ai/v1/chat/completions';
+                const apiKey = 'sk-qlkhkNbXZ9AHionHg10Ycf';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "claude-3-5-sonnet",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are a helpful assistant that rephrases text while maintaining its meaning, making it more professional and engaging for a recognition award. Do not add introductory or concluding phrases, just the rephrased content."
+                            },
+                            {
+                                role: "user",
+                                content: `Please rephrase this paragraph in a professional and engaging way suitable for a corporate recognition award, focusing on impact: ${recognitionText}`
+                            }
+                        ],
+                        temperature: 0.7,
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.choices && data.choices[0] && data.choices[0].message) {
+                    enhancedRecognitionText = data.choices[0].message.content.trim();
+                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Here's|Here is|I've|I have|This is|The following is).*?(a|an|the)?\s?(professionally )?(rephrased|enhanced|improved|refined|polished|new).*?(version|paragraph|text|content).*?:/i, "").trim();
+                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Certainly! |Here's an enhanced version of your recognition: |I can help with that. Here's a professional and engaging rephrasing: |Absolutely, here's a refined recognition message: |Okay, here’s a more impactful version: |Rephrased recognition: )/i, "").trim();
+                    
+                    document.getElementById('originalTextPreview').textContent = originalRecognitionText;
+                    document.getElementById('enhancedTextPreview').textContent = enhancedRecognitionText;
+                    
+                    enhancementOptions.style.display = 'block';
+                    enhancementOptions.scrollIntoView({ behavior: 'smooth' });
+                    
+                    finalRecognitionText = originalRecognitionText;
+                } else {
+                    const errorMsg = data.error ? data.error.message : 'Unknown error from API';
+                    throw new Error(`API Error: ${errorMsg}`);
+                }
+            } catch (error) {
+                console.error('Error enhancing recognition:', error);
+                errorMessageDiv.textContent = `Failed to enhance description: ${error.message}. Please try again or check your API setup.`;
+                errorMessageDiv.style.display = 'block';
+            } finally {
+                isEnhancing = false;
+                enhanceBtn.disabled = false;
+                enhanceBtn.textContent = 'Enhance Description (AI)';
+            }
+        }
+
+        async function submitForm() {
+            const nomineeName = document.getElementById('nomineeName').value.trim();
+            const recognitionText = document.getElementById('recognition').value.trim();
+            const impactType = getSelectedImpactTypes();
+            const enhanceBtn = document.getElementById('enhanceBtn');
+            const generateBtn = document.getElementById('generateBtn');
+            const errorMessageDiv = document.getElementById('errorMessage');
+
+            if (!recognitionText || !nomineeName) {
+                alert('Please enter a nominee name and recognition message!');
+                return;
+            }
+
+            if (impactType.length === 0) {
+                alert('Please select an Impact Type!');
+                return;
+            }
+
+            // Show loading state
+            const resultSection = document.getElementById('resultSection');
+            const loading = document.getElementById('loading');
+            resultSection.style.display = 'block';
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+            enhanceBtn.disabled = true;
+            generateBtn.textContent = 'Sending...';
+
+            try {
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('nomineeName', nomineeName);
+                formData.append('impactType', impactType[0]); // Send the single selected impact type
+                formData.append('recognition', recognitionText);
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const responseText = await response.text();
+                
+                loading.style.display = 'none';
+                
+                // Display the success message from the Apps Script
+                document.getElementById('cardResult').innerHTML = responseText;
+                
+            } catch (error) {
+                loading.style.display = 'none';
+                errorMessageDiv.style.display = 'block';
+                errorMessageDiv.textContent = `Error sending data to Google Apps Script: ${error.message}. Please check the URL and script permissions.`;
+            } finally {
+                generateBtn.disabled = false;
+                enhanceBtn.disabled = false;
+                generateBtn.textContent = 'Generate Card';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Collapsible functionality
             const collapsibleHeader = document.querySelector('.collapsible-header');
             if (collapsibleHeader) {
                 collapsibleHeader.addEventListener('click', function() {
@@ -832,21 +985,15 @@
                 });
             }
 
-            // Bind the photo upload event listeners
-            const photoUploadInput = document.getElementById('photoUpload');
-            const removePhotoBtn = document.getElementById('removePhotoBtn');
-            if (photoUploadInput) {
-                photoUploadInput.addEventListener('change', handlePhotoUpload);
-            }
-            if (removePhotoBtn) {
-                removePhotoBtn.addEventListener('click', removePhoto);
-            }
-            
-            // To ensure the form works with the Apps Script, we use a simple form submission
-            // without custom JavaScript. The form's `action` and `method` attributes handle it.
-            // All old custom JS form logic has been removed.
-            
-            console.log('Casa WOW Awards interface loaded successfully and configured for Apps Script.');
+            // Bind event listeners
+            document.getElementById('photoUpload').addEventListener('change', handlePhotoUpload);
+            document.getElementById('removePhotoBtn').addEventListener('click', removePhoto);
+            document.getElementById('enhanceBtn').addEventListener('click', enhanceRecognition);
+            document.getElementById('generateBtn').addEventListener('click', submitForm);
+
+            // Hide the generate button on initial load
+            toggleGenerateButton(false);
+            console.log('Casa WOW Awards interface loaded successfully with AI enhancement and Apps Script integration.');
         });
     </script>
 </body>
