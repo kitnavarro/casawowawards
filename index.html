@@ -267,6 +267,77 @@
             padding-top: 40px;
             border-top: 2px solid #f3f4f6;
         }
+        
+        /* NEW STYLES FOR ENHANCEMENT SELECTION */
+        .enhancement-options {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f4f7;
+            border-radius: 10px;
+        }
+
+        .enhancement-options h4 {
+            margin-bottom: 10px;
+            color: #4B286D;
+            text-align: center;
+        }
+
+        .enhancement-preview {
+            border: 2px solid #d1c4e9;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .enhancement-preview h5 {
+            color: #66CC00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .enhancement-preview p {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .selection-btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .select-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .select-btn.original {
+            background: #4B286D;
+            color: white;
+        }
+        
+        .select-btn.original:hover {
+            background: #5a3380;
+        }
+        
+        .select-btn.ai-enhanced {
+            background: #66CC00;
+            color: white;
+        }
+        
+        .select-btn.ai-enhanced:hover {
+            background: #5bb300;
+        }
+        /* END NEW STYLES */
 
         .loading {
             text-align: center;
@@ -400,6 +471,75 @@
             background: #5bb300;
             transform: translateY(-1px);
         }
+        
+        /* Collapsible styles */
+        .telus-values {
+            background: #f8f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid #d1c4e9;
+        }
+
+        .collapsible-header {
+            color: #4B286D;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            margin-bottom: 0;
+            padding-right: 25px;
+        }
+
+        .collapsible-header::after {
+            content: '+';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-header.active::after {
+            content: '−';
+            transform: translateY(-50%) rotate(0deg);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+
+        .collapsible-content.active {
+            max-height: 200px;
+        }
+        /* End Collapsible styles */
+
+        .telus-values ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: #6b7280;
+            padding: 0;
+        }
+
+        .telus-values li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .telus-values li:last-child {
+            margin-bottom: 0;
+        }
+
+        .telus-values li strong {
+            color: #4B286D;
+        }
 
         .default-info {
             background: #f9fafb;
@@ -460,68 +600,6 @@
             margin-top: 10px;
         }
 
-        /* Collapsible styles for TELUS Values Reference */
-        .collapsible-section {
-            margin-bottom: 25px;
-            border: 2px solid #d1c4e9;
-            border-radius: 10px;
-            background: #f8f5ff;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .collapsible-header {
-            cursor: pointer;
-            padding: 20px;
-            background: #f8f5ff;
-            color: #4B286D;
-            font-weight: bold;
-            font-size: 1.1em;
-            border: none;
-            outline: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .collapsible-header:focus {
-            box-shadow: 0 0 0 2px #4B286D;
-        }
-
-        .collapsible-arrow {
-            font-size: 1.3em;
-            margin-left: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .collapsible-content {
-            padding: 0 20px 20px 20px;
-            display: none;
-        }
-
-        .collapsible-section.open .collapsible-content {
-            display: block;
-        }
-
-        .collapsible-section.open .collapsible-arrow {
-            transform: rotate(90deg);
-        }
-
-        .telus-values ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            color: #6b7280;
-        }
-
-        .telus-values li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-
-        .telus-values li strong {
-            color: #4B286D;
-        }
-
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2em;
@@ -550,18 +628,10 @@
                 width: 100%;
                 min-width: unset;
             }
-            .collapsible-header {
-                padding: 15px;
-                font-size: 1em;
-            }
-            .collapsible-content {
-                padding: 0 15px 15px 15px;
-            }
         }
     </style>
 
     <script>
-      // Assuming these are for a file system in a specific environment, keeping them as is.
       const files = {}
       window.fs = {}
       window.fs.readFile = (fileName) => {
@@ -576,7 +646,7 @@
         })
       }
     </script>
-    </head>
+</head>
 <body>
     <div class="container">
         <div class="header">
@@ -591,13 +661,9 @@
                 <p>Enter the nominee's name, select the impact type, and write your recognition message below. We'll create a HTML card with your text that you can share.</p>
             </div>
 
-            <!-- Collapsible TELUS Values Reference -->
-            <div class="collapsible-section" id="telusValuesCollapsible">
-                <button type="button" class="collapsible-header" id="collapsibleToggle" aria-expanded="false" aria-controls="collapsibleContent">
-                    TELUS Values Reference
-                    <span class="collapsible-arrow">&#9654;</span>
-                </button>
-                <div class="collapsible-content telus-values" id="collapsibleContent">
+            <div class="telus-values">
+                <h3 class="collapsible-header">TELUS Values Reference</h3>
+                <div class="collapsible-content">
                     <ul>
                         <li><strong>Customers & Communities First:</strong> We passionately put our customers and communities first</li>
                         <li><strong>Embrace Change & Innovation:</strong> We embrace change and innovate courageously</li>
@@ -605,7 +671,6 @@
                     </ul>
                 </div>
             </div>
-            <!-- End Collapsible TELUS Values Reference -->
 
             <form id="cardForm">
                 <div class="form-group">
@@ -669,20 +734,33 @@
                     ></textarea>
                 </div>
 
-                <div class="text-preview" id="textPreview" style="display: none;">
-                    <h4>Recognition Preview:</h4>
-                    <div class="preview-text" id="previewText"></div>
-                </div>
-
                 <div class="button-group">
                     <button type="button" class="action-btn enhance-btn" id="enhanceBtn">
                         Enhance Description (AI)
                     </button>
-                    <button type="submit" class="action-btn generate-btn" id="generateBtn">
-                        Generate HTML Card
+                    <button type="submit" class="action-btn generate-btn" id="generateBtn" style="display: none;">
+                        Generate Card
                     </button>
                 </div>
             </form>
+            
+            <div class="enhancement-options" id="enhancementOptions">
+                <h4>Choose Your Recognition Text</h4>
+                <div class="enhancement-preview">
+                    <h5>Your Original Text:</h5>
+                    <p id="originalTextPreview"></p>
+                    <div class="selection-btn-group">
+                        <button class="select-btn original" onclick="selectRecognitionText('original')">Keep Original</button>
+                    </div>
+                </div>
+                <div class="enhancement-preview">
+                    <h5>AI-Enhanced Version:</h5>
+                    <p id="enhancedTextPreview"></p>
+                    <div class="selection-btn-group">
+                        <button class="select-btn ai-enhanced" onclick="selectRecognitionText('enhanced')">Choose AI-Enhanced</button>
+                    </div>
+                </div>
+            </div>
 
             <div class="result-section" id="resultSection" style="display: none;">
                 <div class="loading" id="loading">
@@ -696,68 +774,28 @@
     </div>
 
     <script>
-        // Collapsible logic for TELUS Values Reference
-        const collapsibleToggle = document.getElementById('collapsibleToggle');
-        const telusValuesCollapsible = document.getElementById('telusValuesCollapsible');
-        const collapsibleContent = document.getElementById('collapsibleContent');
-
-        // Collapse by default
-        telusValuesCollapsible.classList.remove('open');
-        collapsibleToggle.setAttribute('aria-expanded', 'false');
-
-        collapsibleToggle.addEventListener('click', function() {
-            telusValuesCollapsible.classList.toggle('open');
-            const isOpen = telusValuesCollapsible.classList.contains('open');
-            collapsibleToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        // Global variables
-        let currentRecognitionText = '';
+        let originalRecognitionText = '';
+        let enhancedRecognitionText = '';
+        let finalRecognitionText = '';
         let currentNomineeName = '';
         let currentImpactTypes = [];
         let generatedCardHTML = '';
-        let isEnhancing = false; // State for AI enhancement loading
-        let uploadedImageData = null; // To store the Data URL of the uploaded image
+        let isEnhancing = false;
+        let uploadedImageData = null;
 
-        // Preview update function
         function updatePreview() {
             const recognitionText = document.getElementById('recognition').value.trim();
             const nomineeName = document.getElementById('nomineeName').value.trim();
             const impactTypes = getSelectedImpactTypes();
-            const preview = document.getElementById('textPreview');
-            const previewText = document.getElementById('previewText');
-
-            if (recognitionText || nomineeName || uploadedImageData) { // Show preview if any content is present
-                let previewContent = '';
-                if (nomineeName) {
-                    previewContent += `Casa Wower: ${nomineeName}`;
-                }
-                
-                if (impactTypes.length > 0) {
-                    previewContent += (previewContent ? '\n\n' : '') + `Impact Type: ${impactTypes.join(', ')}`;
-                }
-                
-                if (recognitionText) {
-                    previewContent += (previewContent ? '\n\n' : '') + `${recognitionText}`;
-                }
-                
-                preview.style.display = 'block';
-                previewText.textContent = previewContent;
-                currentRecognitionText = recognitionText;
-                currentNomineeName = nomineeName;
-                currentImpactTypes = impactTypes;
-            } else {
-                preview.style.display = 'none';
-            }
+            currentNomineeName = nomineeName;
+            currentImpactTypes = impactTypes;
         }
-
-        // Get selected impact types (UPDATED FOR RADIO BUTTONS)
+        
         function getSelectedImpactTypes() {
             const selectedRadio = document.querySelector('input[name="impactType"]:checked');
             return selectedRadio ? [selectedRadio.value] : [];
         }
 
-        // --- Handle Photo Upload ---
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             const imagePreview = document.getElementById('imagePreview');
@@ -765,33 +803,31 @@
             const errorMessageDiv = document.getElementById('errorMessage');
 
             if (file) {
-                errorMessageDiv.style.display = 'none'; // Hide previous errors
-
-                // Basic validation
-                const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+                errorMessageDiv.style.display = 'none';
+                const MAX_FILE_SIZE = 2 * 1024 * 1024;
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
                 if (file.size > MAX_FILE_SIZE) {
                     errorMessageDiv.textContent = 'File is too large! Max 2MB allowed.';
                     errorMessageDiv.style.display = 'block';
-                    event.target.value = ''; // Clear the input
+                    event.target.value = '';
                     return;
                 }
 
                 if (!allowedTypes.includes(file.type)) {
                     errorMessageDiv.textContent = 'Invalid file type. Only JPG, PNG, GIF are allowed.';
                     errorMessageDiv.style.display = 'block';
-                    event.target.value = ''; // Clear the input
+                    event.target.value = '';
                     return;
                 }
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    uploadedImageData = e.target.result; // Store the Data URL
+                    uploadedImageData = e.target.result;
                     imagePreview.src = uploadedImageData;
                     imagePreview.style.display = 'block';
                     removePhotoBtn.style.display = 'inline-block';
-                    updatePreview(); // Update preview if needed, though photo not in text preview
+                    updatePreview();
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -804,42 +840,51 @@
 
         function removePhoto() {
             uploadedImageData = null;
-            document.getElementById('photoUpload').value = ''; // Clear file input
+            document.getElementById('photoUpload').value = '';
             document.getElementById('imagePreview').src = '#';
             document.getElementById('imagePreview').style.display = 'none';
             document.getElementById('removePhotoBtn').style.display = 'none';
             updatePreview();
         }
-        // --- END NEW: Handle Photo Upload ---
 
+        function toggleGenerateButton(show) {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.style.display = show ? 'block' : 'none';
+        }
 
-        // AI Enhancement Function
+        function selectRecognitionText(version) {
+            finalRecognitionText = version === 'original' ? originalRecognitionText : enhancedRecognitionText;
+            const enhancementOptions = document.getElementById('enhancementOptions');
+            enhancementOptions.style.display = 'none';
+            document.getElementById('recognition').value = finalRecognitionText;
+            document.getElementById('cardForm').scrollIntoView({ behavior: 'smooth' });
+            toggleGenerateButton(true);
+        }
+
         async function enhanceRecognition() {
             const recognitionInput = document.getElementById('recognition');
             let recognitionText = recognitionInput.value.trim();
             const enhanceBtn = document.getElementById('enhanceBtn');
-            const generateBtn = document.getElementById('generateBtn');
+            const enhancementOptions = document.getElementById('enhancementOptions');
             const errorMessageDiv = document.getElementById('errorMessage');
 
             if (!recognitionText) {
                 alert('Please enter a recognition description to enhance!');
                 return;
             }
-
-            // Show loading state
+            
+            enhancementOptions.style.display = 'none';
+            toggleGenerateButton(false);
             isEnhancing = true;
             enhanceBtn.disabled = true;
-            generateBtn.disabled = true;
             enhanceBtn.textContent = 'Enhancing...';
             errorMessageDiv.style.display = 'none';
 
             try {
-                // IMPORTANT: Replace with your actual API endpoint and API key
-                // The provided React code used 'https://proxy.fuelix.ai/v1/chat/completions'
-                // and 'Bearer sk-qlkhkNbXZ9AHionHg10Ycf' (example key).
-                // Use your actual proxy or direct API endpoint and key here.
-                const apiUrl = 'https://proxy.fuelix.ai/v1/chat/completions'; // Example proxy endpoint
-                const apiKey = 'sk-qlkhkNbXZ9AHionHg10Ycf'; // Replace with your actual API key
+                originalRecognitionText = recognitionText;
+                
+                const apiUrl = 'https://proxy.fuelix.ai/v1/chat/completions';
+                const apiKey = 'sk-qlkhkNbXZ9AHionHg10Ycf';
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -848,11 +893,11 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "claude-3-5-sonnet", // Or your preferred model
+                        model: "claude-3-5-sonnet",
                         messages: [
                             {
                                 role: "system",
-                                content: "You are a helpful assistant that rephrases text while maintaining its meaning, making it more professional and engaging for a recognition award. Do not add in[...]"
+                                content: "You are a helpful assistant that rephrases text while maintaining its meaning, making it more professional and engaging for a recognition award. Do not add introductory or concluding phrases, just the rephrased content."
                             },
                             {
                                 role: "user",
@@ -866,12 +911,17 @@
                 const data = await response.json();
                 
                 if (response.ok && data.choices && data.choices[0] && data.choices[0].message) {
-                    let enhancedContent = data.choices[0].message.content;
-                    // Clean up common introductory phrases from AI responses
-                    enhancedContent = enhancedContent.replace(/^(Here's|Here is|I've|I have|This is|The following is).*?(a|an|the)?\s?(professionally )?(rephrased|enhanced|improved|refined|polished|ne[...]/i, "");
-                    enhancedContent = enhancedContent.replace(/^(Certainly! |Here's an enhanced version of your recognition: |I can help with that. Here's a professional and engaging rephrasing: |Abso[...]/i, "");
-                    recognitionInput.value = enhancedContent;
-                    updatePreview(); // Update preview with enhanced text
+                    enhancedRecognitionText = data.choices[0].message.content.trim();
+                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Here's|Here is|I've|I have|This is|The following is).*?(a|an|the)?\s?(professionally )?(rephrased|enhanced|improved|refined|polished|new).*?(version|paragraph|text|content).*?:/i, "").trim();
+                    enhancedRecognitionText = enhancedRecognitionText.replace(/^(Certainly! |Here's an enhanced version of your recognition: |I can help with that. Here's a professional and engaging rephrasing: |Absolutely, here's a refined recognition message: |Okay, here’s a more impactful version: |Rephrased recognition: )/i, "").trim();
+                    
+                    document.getElementById('originalTextPreview').textContent = originalRecognitionText;
+                    document.getElementById('enhancedTextPreview').textContent = enhancedRecognitionText;
+                    
+                    enhancementOptions.style.display = 'block';
+                    enhancementOptions.scrollIntoView({ behavior: 'smooth' });
+                    
+                    finalRecognitionText = originalRecognitionText;
                 } else {
                     const errorMsg = data.error ? data.error.message : 'Unknown error from API';
                     throw new Error(`API Error: ${errorMsg}`);
@@ -883,12 +933,10 @@
             } finally {
                 isEnhancing = false;
                 enhanceBtn.disabled = false;
-                generateBtn.disabled = false;
                 enhanceBtn.textContent = 'Enhance Description (AI)';
             }
         }
 
-        // Form submission handler
         function handleFormSubmit(e) {
             e.preventDefault();
             if (isEnhancing) {
@@ -898,24 +946,20 @@
             generateCard();
         }
 
-        // Card generation function
         async function generateCard() {
-            const recognitionText = document.getElementById('recognition').value.trim();
             const nomineeName = document.getElementById('nomineeName').value.trim();
-            const impactTypes = getSelectedImpactTypes(); // This will now always be an array with 0 or 1 element
+            const impactTypes = getSelectedImpactTypes();
             
-            if (!recognitionText || !nomineeName) {
-                alert('Please enter both the nominee name and recognition message!');
+            if (!finalRecognitionText || !nomineeName) {
+                alert('Please enter a nominee name and either write or select your recognition message!');
                 return;
             }
 
-            // Validation for radio button (already handled by 'required' attribute, but good to have JS fallback)
             if (impactTypes.length === 0) {
                 alert('Please select an Impact Type!');
                 return;
             }
 
-            // Show loading state
             const resultSection = document.getElementById('resultSection');
             const loading = document.getElementById('loading');
             const cardResult = document.getElementById('cardResult');
@@ -932,13 +976,10 @@
             generateBtn.textContent = 'Creating Card...';
 
             try {
-                // Simulate card creation process
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Generate the actual HTML card content
-                const impactTypeDisplay = impactTypes.length > 0 ? impactTypes[0] : ''; // Get the single selected impact type
+                const impactTypeDisplay = impactTypes.length > 0 ? impactTypes[0] : '';
                 
-                // Conditionally include image HTML
                 const imageHtml = uploadedImageData ? 
                     `<div class="card-image-container"><img src="${uploadedImageData}" alt="Recognition Photo" class="card-image"></div>` : '';
                 
@@ -984,7 +1025,6 @@
             border-radius: 8px;
             border: 2px solid #d1c4e9;
         }
-        /* NEW CARD IMAGE STYLES IN EMBEDDED HTML */
         .card-image-container {
             margin-bottom: 20px;
         }
@@ -994,10 +1034,9 @@
             border-radius: 8px;
             display: block;
             margin: 0 auto;
-            max-height: 200px; /* Limit height for embedded card */
+            max-height: 200px;
             object-fit: contain;
         }
-        /* END NEW CARD IMAGE STYLES */
         .content {
             font-size: 16px;
             color: #374151;
@@ -1019,13 +1058,12 @@
         <div class="title">🏆 Congratulations</div>
         <div class="casa-wower">Casa Wower: ${nomineeName}</div>
         ${imageHtml} <div class="impact-type">${impactTypeDisplay}</div>
-        <div class="content">${recognitionText}</div>
+        <div class="content">${finalRecognitionText}</div>
         <div class="footer">TELUS • Casa WOW Awards</div>
     </div>
 </body>
 </html>`;
                 
-                // Create card preview
                 loading.style.display = 'none';
                 cardResult.innerHTML = `
                     <h3 style="color: #4B286D; margin-bottom: 15px; text-align: center;">Your Casa WOW Award Card</h3>
@@ -1034,13 +1072,13 @@
                             <div class="card-title">🏆 Congratulations</div>
                             <div class="casa-wower">Casa Wower: ${nomineeName}</div>
                             ${imageHtml} <div class="impact-type"> ${impactTypeDisplay}</div>
-                            <div class="card-text">${recognitionText}</div>
+                            <div class="card-text">${finalRecognitionText}</div>
                             <div class="card-footer">TELUS • Casa WOW Awards</div>
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 20px;">
                         <button class="download-card-btn" onclick="downloadHTMLCard()">
-                            Download HTML Card
+                            Download Card
                         </button>
                         <button class="email-card-btn" onclick="emailCard()">
                             Email Card
@@ -1055,24 +1093,114 @@
             } finally {
                 generateBtn.disabled = false;
                 enhanceBtn.disabled = false;
-                generateBtn.textContent = 'Generate HTML Card';
+                generateBtn.textContent = 'Generate Card';
             }
         }
 
-        // Download HTML card function
-        // ... (rest of your JS code here, unchanged)
+        function downloadHTMLCard() {
+            if (!generatedCardHTML) {
+                alert('No card generated yet. Please generate a card first.');
+                return;
+            }
 
-        // Event listeners
-        document.getElementById('recognition').addEventListener('input', updatePreview);
-        document.getElementById('nomineeName').addEventListener('input', updatePreview);
-        document.querySelectorAll('input[name="impactType"]').forEach(el => el.addEventListener('change', updatePreview));
-        document.getElementById('photoUpload').addEventListener('change', handlePhotoUpload);
-        document.getElementById('removePhotoBtn').addEventListener('click', removePhoto);
-        document.getElementById('enhanceBtn').addEventListener('click', enhanceRecognition);
-        document.getElementById('cardForm').addEventListener('submit', handleFormSubmit);
+            try {
+                const blob = new Blob([generatedCardHTML], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = `casa-wow-recognition-${currentNomineeName.replace(/\s+/g, '-').toLowerCase()}.html`;
+                downloadLink.style.display = 'none';
+                
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+                
+                alert('HTML card downloaded successfully! Open the HTML file to view your recognition card.');
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Error downloading card. Please try again.');
+            }
+        }
 
-        // ... Add remaining event listeners and functions as needed (e.g. downloadHTMLCard, emailCard, etc.)
+        function emailCard() {
+            if (!finalRecognitionText || !currentNomineeName) {
+                alert('Please generate a card first to email it.');
+                return;
+            }
+
+            const subject = `You've received a Casa WOW Award!`;
+            const body = `Hi ${currentNomineeName},\n\nI wanted to send you this Casa WOW Award to recognize your hard work and dedication.\n\nHere is the recognition message:\n\n${finalRecognitionText}\n\n[NOTE: You can now attach the HTML file you just downloaded to this email!]\n\nCongratulations!`;
+
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            window.location.href = mailtoLink;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsibleHeader = document.querySelector('.collapsible-header');
+            if (collapsibleHeader) {
+                collapsibleHeader.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            }
+
+            const recognitionInput = document.getElementById('recognition');
+            const nomineeInput = document.getElementById('nomineeName');
+            const impactTypeRadios = document.querySelectorAll('input[name="impactType"]');
+            const photoUploadInput = document.getElementById('photoUpload');
+            const removePhotoBtn = document.getElementById('removePhotoBtn');
+            const enhanceButton = document.getElementById('enhanceBtn');
+            const cardForm = document.getElementById('cardForm');
+            
+            if (recognitionInput) {
+                recognitionInput.addEventListener('input', updatePreview);
+                recognitionInput.addEventListener('input', function() {
+                    const charCount = this.value.length;
+                    if (charCount > 500) { 
+                        this.style.borderColor = '#f59e0b';
+                    } else {
+                        this.style.borderColor = '#e5e7eb';
+                    }
+                });
+            }
+
+            if (nomineeInput) {
+                nomineeInput.addEventListener('input', updatePreview);
+            }
+
+            impactTypeRadios.forEach(radio => {
+                radio.addEventListener('change', updatePreview);
+            });
+
+            if (photoUploadInput) {
+                photoUploadInput.addEventListener('change', handlePhotoUpload);
+            }
+            if (removePhotoBtn) {
+                removePhotoBtn.addEventListener('click', removePhoto);
+            }
+
+            if (enhanceButton) {
+                enhanceButton.addEventListener('click', enhanceRecognition);
+            }
+
+            if (cardForm) {
+                cardForm.addEventListener('submit', handleFormSubmit);
+            }
+
+            // Hide the Generate button on page load
+            toggleGenerateButton(false);
+
+            console.log('Casa WOW Awards interface loaded successfully!');
+        });
     </script>
 </body>
 </html>
-
